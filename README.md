@@ -12,4 +12,4 @@ Todo
 
 This will delete all data in the database!
 
-`npx wrangler d1 execute --remote --file ./schema.sql --yes`
+`npx wrangler d1 execute <your-d1-name> --remote --file ./schema.sql --yes`

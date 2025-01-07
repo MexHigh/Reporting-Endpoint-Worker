@@ -1,4 +1,5 @@
 import { corsResponse } from "./cors"
+import { clearOldEntriesFromD1 } from "./d1_maintenance"
 import { handleReportingAPIReport, handleLegacyCSPReport, handleTLSRPTReport, handleCAAReport } from "./handlers"
 
 export default {
@@ -14,7 +15,7 @@ export default {
 		}
 
 		// check correct content type (only log warning)
-		let contentType = request.headers.get("content-type")
+		const contentType = request.headers.get("content-type")
 		if (!contentType || !contentType.includes("application/reports+json")) {
 			console.log({ message: `content-type of incoming POST request is not "application/reports+json", got "${contentType}" instead` })
 		}
@@ -28,7 +29,7 @@ export default {
 		}
 
 		// match route
-		let url = new URL(request.url)
+		const url = new URL(request.url)
 		switch (url.pathname) { // `url.pathname` only contains path without query params
 			// web reporting api endpoint
 			case "/reporting":
@@ -54,4 +55,13 @@ export default {
 				return corsResponse("Not found", { status: 404 })
 		}
 	},
+
+	async scheduled(event, env, ctx) {
+		const result = await clearOldEntriesFromD1(env)
+		const logF = result.success ? console.log : console.error
+		logF({ 
+			message: `Old entries cleared from D1: ${result.meta.changes} changes, took ${result.meta.duration} seconds`, 
+			result: result
+		})
+	}
 }

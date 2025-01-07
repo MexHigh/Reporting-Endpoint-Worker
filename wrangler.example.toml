@@ -4,6 +4,15 @@ main = "src/index.js"
 compatibility_date = "2024-12-30"
 compatibility_flags = ["nodejs_compat"]
 
+# Configuration variables
+[vars]
+KEEP_REPORTS = 1000      # defines how many reports should be kept in the database PER TABLE
+
+# Triggers to invoke the scheduled() handler for cleaning up the D1 database
+# Docs: https://developers.cloudflare.com/workers/configuration/cron-triggers
+[triggers]
+crons = [ "0 0 * * *" ]
+
 # Workers Logs
 # Docs: https://developers.cloudflare.com/workers/observability/logs/workers-logs/
 # Configuration: https://developers.cloudflare.com/workers/observability/logs/workers-logs/#enable-workers-logs

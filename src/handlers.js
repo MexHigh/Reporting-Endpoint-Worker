@@ -25,7 +25,7 @@ export async function handleReportingAPIReport(env, ctx, body) {
 
 		// TODO there is also the fields "age" and "userAgent", see spec
 
-		let b = report.body
+		const b = report.body
 		let statement = null
 		switch (report.type) {
 			case "csp-violation":

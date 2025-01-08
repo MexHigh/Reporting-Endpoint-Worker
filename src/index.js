@@ -60,7 +60,7 @@ export default {
 		const result = await clearOldEntriesFromD1(env)
 		const logF = result.success ? console.log : console.error
 		logF({ 
-			message: `Old entries cleared from D1: ${result.meta.changes} changes, took ${result.meta.duration} seconds`, 
+			message: "Old entries cleared from D1", 
 			result: result
 		})
 	}

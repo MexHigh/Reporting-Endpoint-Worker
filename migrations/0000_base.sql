@@ -1,3 +1,5 @@
+-- Migration number: 0000 	 2025-01-12T14:30:46.551Z
+
 DROP TABLE IF EXISTS CSPReports;
 CREATE TABLE IF NOT EXISTS CSPReports (
     _ID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -5,6 +7,8 @@ CREATE TABLE IF NOT EXISTS CSPReports (
 
     /* Report */
     URL TEXT,
+    UserAgent TEXT, 
+    Age INTEGER,
 
     /* CSPViolationReportBody */
     BlockedURL TEXT,
@@ -27,6 +31,8 @@ CREATE TABLE IF NOT EXISTS DeprecationReports (
     
     /* Report */
     URL TEXT,
+    UserAgent TEXT, 
+    Age INTEGER,
 
     /* DeprecationReportBody */
     ID TEXT,
@@ -44,6 +50,8 @@ CREATE TABLE IF NOT EXISTS InterventionReports (
 
     /* Report */
     URL TEXT,
+    UserAgent TEXT, 
+    Age INTEGER,
     
     /* InterventionReportBody */
     ID TEXT,
@@ -52,25 +60,3 @@ CREATE TABLE IF NOT EXISTS InterventionReports (
     LineNumber INTEGER,
     ColumnNumber INTEGER
 );
-
-/*
-DROP TABLE IF EXISTS PermissionsPolicyReports;
-CREATE TABLE IF NOT EXISTS PermissionsPolicyReports (
-    _ID INTEGER PRIMARY KEY AUTOINCREMENT
-);
-
-DROP TABLE IF EXISTS CrashReports;
-CREATE TABLE IF NOT EXISTS CrashReports (
-    _ID INTEGER PRIMARY KEY AUTOINCREMENT
-);
-
-DROP TABLE IF EXISTS TLSRPTReports;
-CREATE TABLE IF NOT EXISTS CAAReports (
-    _ID INTEGER PRIMARY KEY AUTOINCREMENT
-);
-
-DROP TABLE IF EXISTS CAAReports;
-CREATE TABLE IF NOT EXISTS CAAReports (
-    _ID INTEGER PRIMARY KEY AUTOINCREMENT
-);
-*/

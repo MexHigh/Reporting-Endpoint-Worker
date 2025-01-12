@@ -5,7 +5,10 @@
  * @returns {D1Result} Database delete operation result
  */
 export async function clearOldEntriesFromD1(env) {
-    const tablesToPrune = ["CSPReports", "DeprecationReports", "InterventionReports"]
+    const tablesToPrune = [
+        "CSPReports", "DeprecationReports", 
+        "InterventionReports", "NetworkErrorReports"
+    ]
     
     let statements = []
     tablesToPrune.forEach(tableName => {

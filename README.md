@@ -8,28 +8,31 @@ Currently supported report types:
 - CSP Violations &rarr; `csp-violation`
 - Deprecations &rarr; `deprecation`
 - Interventions &rarr; `intervention`
-- Network Error Logging (NEL) &rarr; `network-error` _(soon)_
+- Network Error Logging (NEL) &rarr; `network-error` _(experimental)_
 
 See [here](https://developer.mozilla.org/de/docs/Web/HTTP/Headers/Reporting-Endpoints) for instructions on setting up the Reporting Headers to utilize this endpoint. Keep in mind that this Spec is currently experimental and only supported in Chromium based browsers out of the box (Firefox supports it via a config variable)!
 
+
 ## Deploy
 
-1. [Install Wrangler](https://developers.cloudflare.com/workers/wrangler/install-and-update/)
-1. [Login to Cloudflare with Wrangler](https://developers.cloudflare.com/workers/wrangler/commands/#login)
+1. [Login to Cloudflare with Wrangler](https://developers.cloudflare.com/workers/wrangler/commands/#login) (Wrangler can be invoked with `npx wrangler <commands>`)
 1. [Create a D1 database](https://developers.cloudflare.com/d1/get-started/)
 1. Copy `wrangler.example.toml` to `wrangler.toml`
-1. Fill in your Worker and D1 details in `wrangler.toml`
-1. Run `npm run deploy` (a new Worker will be created for you with the name and routes you have configured in `wrangler.toml`)
+1. Edit `wrangler.toml`:
+    - Change the desired Worker name (optional)
+    - Fill in your D1 details (`database_name` and `database_name`, do not edit the `binding`!)
+1. Initialize the database: `npx wrangler d1 migrations apply --remote <database_name>`
+1. Deploy the worker: `npm run deploy` (a new Worker will be created for you with the name, bindings and routes you have configured in `wrangler.toml`)
 
-## Initializing the D1 database
-
-This will delete all data in the database!
-
-`npx wrangler d1 execute <your-d1-name> --remote --file ./schema.sql --yes`
 
 ## Run D1 database migrations
 
-Todo
+Doing updates to this tool which require database migrations can be done without losing data. Just pull the current state of this repo and run the migrations:
+- `git pull`
+- `npx wrangler d1 migrations list --remote <database_name>` (to check which migrations must be applied)
+- `npx wrangler d1 migrations apply --remote <database_name>`
+- `npm run deploy`
+
 
 ## Pruning old reports
 

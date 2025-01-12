@@ -22,17 +22,25 @@ export async function handleReportingAPIReport(env, ctx, body) {
 			console.error({ message: `"url" field of report ${index} is empty`, report: report })
 			return corsResponse(`"url" field of report ${index} is empty`, { status: 400 })
 		}
-
-		// TODO there is also the fields "age" and "userAgent", see spec
+		if (!report.user_agent) {
+			console.error({ message: `"user_agent" field of report ${index} is empty`, report: report })
+			return corsResponse(`"user_agent" field of report ${index} is empty`, { status: 400 })
+		}
+		if (!report.age) {
+			console.error({ message: `"age" field of report ${index} is empty`, report: report })
+			return corsResponse(`"age" field of report ${index} is empty`, { status: 400 })
+		}
 
 		const b = report.body
 		let statement = null
 		switch (report.type) {
 			case "csp-violation":
 				statement = env.D1_REPORTS.prepare(
-					"INSERT INTO CSPReports VALUES (NULL, datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+					"INSERT INTO CSPReports VALUES (NULL, datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 				).bind(
 					report.url,
+					report.user_agent,
+					report.age,
 					b.blockedURL         ? b.blockedURL         : null,
 					b.statusCode         ? b.statusCode         : null,
 					b.referrer           ? b.referrer           : null,
@@ -49,9 +57,11 @@ export async function handleReportingAPIReport(env, ctx, body) {
 			
 			case "deprecation":
 				statement = env.D1_REPORTS.prepare(
-					"INSERT INTO DeprecationReports VALUES (NULL, datetime('now'), ?, ?, ?, ?, ?, ?, ?)"
+					"INSERT INTO DeprecationReports VALUES (NULL, datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 				).bind(
 					report.url,
+					report.user_agent,
+					report.age,
 					b.id                 ? b.id                 : null,
 					b.anticipatedRemoval ? b.anticipatedRemoval : null,
 					b.message            ? b.message            : null,
@@ -63,14 +73,35 @@ export async function handleReportingAPIReport(env, ctx, body) {
 			
 			case "intervention":
 				statement = env.D1_REPORTS.prepare(
-					"INSERT INTO InterventionReports VALUES (NULL, datetime('now'), ?, ?, ?, ?, ?, ?)"
+					"INSERT INTO InterventionReports VALUES (NULL, datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?)"
 				).bind(
 					report.url,
+					report.user_agent,
+					report.age,
 					b.id                 ? b.id                 : null,
 					b.message            ? b.message            : null,
 					b.sourceFile         ? b.sourceFile         : null,
 					b.lineNumber         ? b.lineNumber         : null,
 					b.columnNumber       ? b.columnNumber       : null,
+				)
+				break
+
+			case "network-error":
+				statement = env.D1_REPORTS.prepare(
+					"INSERT INTO NetworkErrorReports VALUES (NULL, datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+				).bind(
+					report.url,
+					report.user_agent,
+					report.age,
+					b.method             ? b.method             : null,
+					b.phase              ? b.phase              : null,
+					b.protocol           ? b.protocol           : null,
+					b.referrer           ? b.referrer           : null,
+					b.server_ip          ? b.server_ip          : null,
+					b.type               ? b.type               : null,
+					b.elapsed_time       ? b.elapsed_time       : null,
+					b.sampling_fraction  ? b.sampling_fraction  : null,
+					b.status_code        ? b.status_code        : null,
 				)
 				break
 	

@@ -57,11 +57,11 @@ export default {
 	},
 
 	async scheduled(event, env, ctx) {
-		const result = await clearOldEntriesFromD1(env)
-		const logF = result.success ? console.log : console.error
+		const results = await clearOldEntriesFromD1(env)
+		const logF = results.every(result => result.success === true) ? console.log : console.error
 		logF({ 
 			message: "Old entries cleared from D1", 
-			result: result
+			results: results
 		})
 	}
 }

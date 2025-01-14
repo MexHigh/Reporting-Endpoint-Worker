@@ -1,34 +1,37 @@
 import { corsResponse } from "./cors"
 
+function getMissingRequiredFields(report) {
+	let m = []
+	if (!report.type)       m.push("type")
+	if (!report.body)       m.push("body")
+	if (!report.url)        m.push("url")
+	if (!report.user_agent) m.push("user_agent")
+	// age can be `0` so we can't use `!report.age` here
+	if (report.age === undefined || report.age === null) m.push("age")
+	
+	return m
+}
+
 export async function handleReportingAPIReport(env, ctx, body) {
 	console.log({ message: "Recieved reporting API payload", reports: body })
 
 	if (!Array.isArray(body)) {
-		console.error({ message: "Reporting API payload is not an array" })
-		return corsResponse(`Body should be an array of report objects`, { status: 400 })
+		// check if there is an report object present top level and create an array from it
+		if (typeof body === "object" && body.type !== undefined) {
+			console.log("recieved report object instead of report array, converting to array")
+			body = [body]
+		} else { // neither array nor report object
+			console.error({ message: "Reporting API payload is neither an array of reports, nor an report" })
+			return corsResponse(`Body should be an array of report objects`, { status: 400 })
+		}
 	}
 
 	let statements = []
 	body.forEach((report, index) => {
-		if (!report.type) {
-			console.error({ message: `"type" field of report ${index} is empty`, report: report })
-			return corsResponse(`"type" field of report ${index} is empty`, { status: 400 })
-		}
-		if (!report.body) {
-			console.error({ message: `"body" field of report ${index} is empty`, report: report })
-			return corsResponse(`"body" field of report ${index} is empty`, { status: 400 })
-		}
-		if (!report.url) {
-			console.error({ message: `"url" field of report ${index} is empty`, report: report })
-			return corsResponse(`"url" field of report ${index} is empty`, { status: 400 })
-		}
-		if (!report.user_agent) {
-			console.error({ message: `"user_agent" field of report ${index} is empty`, report: report })
-			return corsResponse(`"user_agent" field of report ${index} is empty`, { status: 400 })
-		}
-		if (!report.age) {
-			console.error({ message: `"age" field of report ${index} is empty`, report: report })
-			return corsResponse(`"age" field of report ${index} is empty`, { status: 400 })
+		const missingFields = getMissingRequiredFields(report)
+		if (missingFields.length > 0) {
+			console.error({ message: `report ${index} misses required fields: ${missingFields.join(', ')}`, report: report })
+			return corsResponse(`report ${index} misses required fields: ${missingFields.join(', ')}`, { status: 400 })
 		}
 
 		const b = report.body

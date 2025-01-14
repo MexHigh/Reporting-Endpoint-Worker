@@ -17,7 +17,10 @@ export default {
 		// check correct content type (only log warning)
 		const contentType = request.headers.get("content-type")
 		if (!contentType || !contentType.includes("application/reports+json")) {
-			console.log({ message: `content-type of incoming POST request is not "application/reports+json", got "${contentType}" instead` })
+			console.log({ message: `content-type of incoming POST request is not "application/reports+json", got "${contentType}" instead, continuing anyways` })
+			// Justification: some older iPhones send Reporting API v1 CSP violation reports,
+			// but not as an array and with the old content type of "application/csp-report". 
+			// We want to still support them.
 		}
 
 		// get body

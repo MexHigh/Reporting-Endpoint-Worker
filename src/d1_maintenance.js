@@ -6,8 +6,11 @@
  */
 export async function clearOldEntriesFromD1(env) {
     const tablesToPrune = [
-        "CSPReports", "DeprecationReports", 
-        "InterventionReports", "NetworkErrorReports"
+        "CSPReports", 
+        "DeprecationReports", 
+        "InterventionReports", 
+        "NetworkErrorReports",
+        "CrashReports",
     ]
     
     let statements = []

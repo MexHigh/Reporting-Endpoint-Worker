@@ -5,10 +5,12 @@ function getMissingRequiredFields(report) {
 	if (!report.type)       m.push("type")
 	if (!report.body)       m.push("body")
 	if (!report.url)        m.push("url")
-	if (!report.user_agent) m.push("user_agent")
+
+	// user_agent and age are semi-required for some reason
+	//if (!report.user_agent) m.push("user_agent")
 	// age can be `0` so we can't use `!report.age` here
-	if (report.age === undefined || report.age === null) m.push("age")
-	
+	//if (report.age === undefined || report.age === null) m.push("age")
+
 	return m
 }
 
@@ -41,9 +43,10 @@ export async function handleReportingAPIReport(env, ctx, body) {
 				statement = env.D1_REPORTS.prepare(
 					"INSERT INTO CSPReports VALUES (NULL, datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 				).bind(
-					report.url,
-					report.user_agent,
-					report.age,
+					report.url                                      ? report.url           : null,
+					report.user_agent                               ? report.user_agent    : null,
+					report.age !== undefined && report.age !== null ? report.age           : null,
+
 					b.blockedURL         ? b.blockedURL         : null,
 					b.statusCode         ? b.statusCode         : null,
 					b.referrer           ? b.referrer           : null,
@@ -62,9 +65,10 @@ export async function handleReportingAPIReport(env, ctx, body) {
 				statement = env.D1_REPORTS.prepare(
 					"INSERT INTO DeprecationReports VALUES (NULL, datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 				).bind(
-					report.url,
-					report.user_agent,
-					report.age,
+					report.url                                      ? report.url           : null,
+					report.user_agent                               ? report.user_agent    : null,
+					report.age !== undefined && report.age !== null ? report.age           : null,
+
 					b.id                 ? b.id                 : null,
 					b.anticipatedRemoval ? b.anticipatedRemoval : null,
 					b.message            ? b.message            : null,
@@ -78,9 +82,10 @@ export async function handleReportingAPIReport(env, ctx, body) {
 				statement = env.D1_REPORTS.prepare(
 					"INSERT INTO InterventionReports VALUES (NULL, datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?)"
 				).bind(
-					report.url,
-					report.user_agent,
-					report.age,
+					report.url                                      ? report.url           : null,
+					report.user_agent                               ? report.user_agent    : null,
+					report.age !== undefined && report.age !== null ? report.age           : null,
+
 					b.id                 ? b.id                 : null,
 					b.message            ? b.message            : null,
 					b.sourceFile         ? b.sourceFile         : null,
@@ -93,9 +98,10 @@ export async function handleReportingAPIReport(env, ctx, body) {
 				statement = env.D1_REPORTS.prepare(
 					"INSERT INTO NetworkErrorReports VALUES (NULL, datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 				).bind(
-					report.url,
-					report.user_agent,
-					report.age,
+					report.url                                      ? report.url           : null,
+					report.user_agent                               ? report.user_agent    : null,
+					report.age !== undefined && report.age !== null ? report.age           : null,
+
 					b.method             ? b.method             : null,
 					b.phase              ? b.phase              : null,
 					b.protocol           ? b.protocol           : null,
@@ -105,6 +111,19 @@ export async function handleReportingAPIReport(env, ctx, body) {
 					b.elapsed_time       ? b.elapsed_time       : null,
 					b.sampling_fraction  ? b.sampling_fraction  : null,
 					b.status_code        ? b.status_code        : null,
+				)
+				break
+
+			case "crash":
+				statement = env.D1_REPORTS.prepare(
+					"INSERT INTO CrashReports VALUES (NULL, datetime('now'), ?, ?, ?, ?, ?)"
+				).bind(
+					report.url                                      ? report.url           : null,
+					report.user_agent                               ? report.user_agent    : null,
+					report.age !== undefined && report.age !== null ? report.age           : null,
+
+					b.reason             ? b.reason             : null,
+					b.stack              ? b.stack              : null,
 				)
 				break
 	

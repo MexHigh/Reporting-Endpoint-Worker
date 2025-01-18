@@ -9,6 +9,7 @@ Currently supported report types:
 - Deprecations &rarr; `deprecation`
 - Interventions &rarr; `intervention`
 - Network Error Logging (NEL) &rarr; `network-error` _(experimental)_
+- Crash Reports &rarr; `crash` _(experimental)_
 
 See [here](https://developer.mozilla.org/de/docs/Web/HTTP/Headers/Reporting-Endpoints) for instructions on setting up the Reporting Headers to utilize this endpoint. Keep in mind that this Spec is currently experimental and only supported in Chromium based browsers out of the box (Firefox supports it via a config variable)!
 

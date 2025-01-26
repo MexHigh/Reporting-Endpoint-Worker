@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS NetworkErrorReports (
     UserAgent TEXT, 
     Age INTEGER,
     
-    /* NELBody (experimental) */
+    /* experimental, name of report body not yet defined in standard */
     Method TEXT,
     Phase TEXT,
     Protocol TEXT,

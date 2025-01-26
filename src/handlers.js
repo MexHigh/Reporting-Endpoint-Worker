@@ -14,6 +14,13 @@ function getMissingRequiredFields(report) {
 	return m
 }
 
+function thisOrNull(e) {
+	if (e !== undefined && e !== null)
+		return e
+	else 
+		return null
+}
+
 export async function handleReportingAPIReport(env, ctx, body) {
 	console.log({ message: "Recieved reporting API payload", reports: body })
 
@@ -43,11 +50,11 @@ export async function handleReportingAPIReport(env, ctx, body) {
 				statement = env.D1_REPORTS.prepare(
 					"INSERT INTO CSPReports VALUES (NULL, datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 				).bind(
-					report.url                                      ? report.url           : null,
-					report.user_agent                               ? report.user_agent    : null,
-					report.age !== undefined && report.age !== null ? report.age           : null,
+					thisOrNull(report.url),
+					thisOrNull(report.user_agent),
+					thisOrNull(report.age),
 
-					b.blockedURL         ? b.blockedURL         : null,
+					b.blockedURL         ? b.blockedURL         : null, // TODO use `thisOrNull` for all of those later
 					b.statusCode         ? b.statusCode         : null,
 					b.referrer           ? b.referrer           : null,
 					b.documentURL        ? b.documentURL        : null,
@@ -65,9 +72,9 @@ export async function handleReportingAPIReport(env, ctx, body) {
 				statement = env.D1_REPORTS.prepare(
 					"INSERT INTO DeprecationReports VALUES (NULL, datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 				).bind(
-					report.url                                      ? report.url           : null,
-					report.user_agent                               ? report.user_agent    : null,
-					report.age !== undefined && report.age !== null ? report.age           : null,
+					thisOrNull(report.url),
+					thisOrNull(report.user_agent),
+					thisOrNull(report.age),
 
 					b.id                 ? b.id                 : null,
 					b.anticipatedRemoval ? b.anticipatedRemoval : null,
@@ -82,9 +89,9 @@ export async function handleReportingAPIReport(env, ctx, body) {
 				statement = env.D1_REPORTS.prepare(
 					"INSERT INTO InterventionReports VALUES (NULL, datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?)"
 				).bind(
-					report.url                                      ? report.url           : null,
-					report.user_agent                               ? report.user_agent    : null,
-					report.age !== undefined && report.age !== null ? report.age           : null,
+					thisOrNull(report.url),
+					thisOrNull(report.user_agent),
+					thisOrNull(report.age),
 
 					b.id                 ? b.id                 : null,
 					b.message            ? b.message            : null,
@@ -98,9 +105,9 @@ export async function handleReportingAPIReport(env, ctx, body) {
 				statement = env.D1_REPORTS.prepare(
 					"INSERT INTO NetworkErrorReports VALUES (NULL, datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 				).bind(
-					report.url                                      ? report.url           : null,
-					report.user_agent                               ? report.user_agent    : null,
-					report.age !== undefined && report.age !== null ? report.age           : null,
+					thisOrNull(report.url),
+					thisOrNull(report.user_agent),
+					thisOrNull(report.age),
 
 					b.method             ? b.method             : null,
 					b.phase              ? b.phase              : null,
@@ -118,15 +125,32 @@ export async function handleReportingAPIReport(env, ctx, body) {
 				statement = env.D1_REPORTS.prepare(
 					"INSERT INTO CrashReports VALUES (NULL, datetime('now'), ?, ?, ?, ?, ?)"
 				).bind(
-					report.url                                      ? report.url           : null,
-					report.user_agent                               ? report.user_agent    : null,
-					report.age !== undefined && report.age !== null ? report.age           : null,
+					thisOrNull(report.url),
+					thisOrNull(report.user_agent),
+					thisOrNull(report.age),
 
 					b.reason             ? b.reason             : null,
 					b.stack              ? b.stack              : null,
 				)
 				break
 	
+			case "permissions-policy-violation":
+				statement = env.D1_REPORTS.prepare(
+					"INSERT INTO PermissionsPolicyReports VALUES (NULL, datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+				).bind(
+					thisOrNull(report.url),
+					thisOrNull(report.user_agent),
+					thisOrNull(report.age),
+
+					thisOrNull(b.disposition),
+					thisOrNull(b.message),
+					thisOrNull(b.policyId),
+					thisOrNull(b.sourceFile),
+					thisOrNull(b.lineNumber),
+					thisOrNull(b.columnNumber),
+				)
+				break
+
 			default:
 				console.error({ message: `Report type "${report.type}" in report ${index} unsupported or unknown`, report: report })
 				return corsResponse(`Report type "${report.type}" in report ${index} unsupported or unknown`, { status: 400 })

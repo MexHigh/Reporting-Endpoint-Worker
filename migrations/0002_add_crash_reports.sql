@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS CrashReports (
     UserAgent TEXT, 
     Age INTEGER,
     
-    /* CrashBody (experimental) */
+    /* experimental, name of report body not yet defined in standard */
     Reason TEXT,
     Stack TEXT
 );
